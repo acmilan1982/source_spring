@@ -68,7 +68,7 @@ public class AnnotatedBeanDefinitionReader {
 	 */
 	// 构造方法1
 	public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry) {
-		this(registry, getOrCreateEnvironment(registry));   // 见代码2
+		this(registry, getOrCreateEnvironment(registry));   // 见构造方法2
 	}
 
 

@@ -69,10 +69,19 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 */
 	// 构造方法
 	public AnnotationConfigServletWebServerApplicationContext() {
-		// 调用父类 ServletWebServerApplicationContext 构造方法
-		// 见AnnotatedBeanDefinitionReader构造方法
-		this.reader = new AnnotatedBeanDefinitionReader(this);
-		this.scanner = new ClassPathBeanDefinitionScanner(this);
+		// 调用父类的构造方法，会创建一个 BeanFactory 对象：DefaultListableBeanFactory
+
+
+		/**
+			硬编码注册一系列PostProcessor，仅注册BeanDefinition
+			注册  org.springframework.context.annotation.internalConfigurationAnnotationProcessor -> ConfigurationClassPostProcessor
+			注册  org.springframework.context.annotation.internalAutowiredAnnotationProcessor -> AutowiredAnnotationBeanPostProcessor
+			注册  org.springframework.context.annotation.internalCommonAnnotationProcessor -> CommonAnnotationBeanPostProcessor
+			注册  org.springframework.context.event.internalEventListenerProcessor -> EventListenerMethodProcessor
+			注册  org.springframework.context.event.internalEventListenerFactory -> DefaultEventListenerFactory
+		 */		
+		this.reader = new AnnotatedBeanDefinitionReader(this);       // 见AnnotatedBeanDefinitionReader构造方法1
+		this.scanner = new ClassPathBeanDefinitionScanner(this);     // 见ClassPathBeanDefinitionScanner构造方法1
 	}
 
 	/**
@@ -88,16 +97,17 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	}
 
 	/**
-	 * Create a new {@link AnnotationConfigServletWebServerApplicationContext}, deriving
-	 * bean definitions from the given annotated classes and automatically refreshing the
-	 * context.
-	 * @param annotatedClasses one or more annotated classes, e.g. {@code @Configuration}
-	 * classes
+		Create a new AnnotationConfigServletWebServerApplicationContext, 
+		deriving bean definitions from the given annotated classes and automatically refreshing the context.
+		
+		Params:
+		  annotatedClasses – one or more annotated classes, e.g. @Configuration classes
 	 */
+	//构造方法3
 	public AnnotationConfigServletWebServerApplicationContext(Class<?>... annotatedClasses) {
-		this();
-		register(annotatedClasses);
-		refresh();
+		this();                         // 调用无参构造方法
+		register(annotatedClasses);     // 注册配置类，见代码1
+		refresh();                      // 刷新容器，见父类 ServletWebServerApplicationContext 代码5
 	}
 
 	/**
@@ -112,6 +122,28 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 		refresh();
 	}
 
+
+
+
+	/**
+		Register one or more annotated classes to be processed. 
+		Note that refresh() must be called in order for the context to fully process the new class.
+
+		Calls to #register are idempotent; adding the same annotated class more than once has no additional effect.
+		Params:
+		annotatedClasses – one or more annotated classes, e.g. @Configuration classes
+		See Also:
+		scan(String...), refresh()
+	 */
+	//代码1
+	@Override
+	public final void register(Class<?>... annotatedClasses) {
+		Assert.notEmpty(annotatedClasses, "At least one annotated class must be specified");
+		// private final Set<Class<?>> annotatedClasses = new LinkedHashSet<>();
+		this.annotatedClasses.addAll(Arrays.asList(annotatedClasses));
+	}	
+
+
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -123,6 +155,14 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 		super.setEnvironment(environment);
 		this.reader.setEnvironment(environment);
 		this.scanner.setEnvironment(environment);
+	}
+
+
+	//代码3
+	@Override
+	protected void prepareRefresh() {
+		this.scanner.clearCache();
+		super.prepareRefresh();
 	}
 
 	/**
@@ -160,24 +200,6 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	}
 
 	/**
-	 * Register one or more annotated classes to be processed. Note that
-	 * {@link #refresh()} must be called in order for the context to fully process the new
-	 * class.
-	 * <p>
-	 * Calls to {@code #register} are idempotent; adding the same annotated class more
-	 * than once has no additional effect.
-	 * @param annotatedClasses one or more annotated classes, e.g. {@code @Configuration}
-	 * classes
-	 * @see #scan(String...)
-	 * @see #refresh()
-	 */
-	@Override
-	public final void register(Class<?>... annotatedClasses) {
-		Assert.notEmpty(annotatedClasses, "At least one annotated class must be specified");
-		this.annotatedClasses.addAll(Arrays.asList(annotatedClasses));
-	}
-
-	/**
 	 * Perform a scan within the specified base packages. Note that {@link #refresh()}
 	 * must be called in order for the context to fully process the new class.
 	 * @param basePackages the packages to check for annotated classes
@@ -190,11 +212,7 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 		this.basePackages = basePackages;
 	}
 
-	@Override
-	protected void prepareRefresh() {
-		this.scanner.clearCache();
-		super.prepareRefresh();
-	}
+
 
 	@Override
     // 代码10
