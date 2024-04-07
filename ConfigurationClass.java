@@ -85,7 +85,7 @@ final class ConfigurationClass {
 		  ConfigurationClass(Class, ConfigurationClass)
 	 */
 	// 构造方法
-	ConfigurationClass(AnnotationMetadata metadata, 
+	hg,ConfigurationClass(AnnotationMetadata metadata, 
 	                   String beanName) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		this.metadata = metadata;

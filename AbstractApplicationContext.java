@@ -505,14 +505,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 对于AnnotationConfigApplicationContext，基本上什么都不干
 				// 对于 AnnotationConfigServletWebServerApplicationContext，注册 annotatedClasses，仅注册配置类本身，未读取配置类内容
 				// Allows post-processing of the bean factory in context subclasses.
-				postProcessBeanFactory(beanFactory);             // 由子类实现，见AnnotationConfigServletWebServerApplicationContext代码10
+				postProcessBeanFactory(beanFactory);             // 由子类实现，见 AnnotationConfigServletWebServerApplicationContext 代码10
 
 
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 
 
-               // 重要：从容器中获取所有 eanFactoryPostProcessor，根据指定顺序，执行所有BeanFactoryPostProcessor
+               // 重要：从容器中获取所有 BeanFactoryPostProcessor，根据指定顺序，执行所有BeanFactoryPostProcessor
+			   // 注意，有一些 BeanFactoryPostProcessor，此时以普通bean的方式存在，当前方法根据类型获取所有BeanFactoryPostProcessor并执行
 			   /*
 				*  step1: 执行所有的 BeanDefinitionRegistryPostProcessor
 				*         1. 执行所有实现了 PriorityOrdered 的 BeanDefinitionRegistryPostProcessor 的 postProcessBeanDefinitionRegistry 方法
@@ -529,7 +530,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);    // 见代码25
 
-				// 重要：从容器中获取所有 BeanPostProcessors,并注册
+ 
+
+               // 重要：从容器中获取所有 BeanPostProcessors,并注册
+			   // 注意，有一些 BeanPostProcessors，此时以普通bean的方式存在，当前方法根据类型获取所有 BeanPostProcessors 并注册
+			   /*
+ 
+				* 
+				*/
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);         // 见代码27
 
@@ -786,11 +794,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		Must be called before any instantiation of application beans.
 
 		实例化并注册所有的BeanPostProcessor(根据BeanPostProcessor本身指定的顺序)
-		在方法必须在任何普通bean实例化之前被调用
+		该方法必须在任何普通bean实例化之前被调用
 	 */
     // 代码27
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		PostProcessorRegistrationDelegate.registerBeanPostProcessors(beanFactory, this);
+		PostProcessorRegistrationDelegate.registerBeanPostProcessors(beanFactory, this);    // 见 PostProcessorRegistrationDelegate 代码5
 	}
 
  

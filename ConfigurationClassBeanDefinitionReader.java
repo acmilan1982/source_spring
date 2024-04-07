@@ -123,9 +123,9 @@ import org.apache.commons.logging.Log;
  
  
      /**
-      * Read {@code configurationModel}, registering bean definitions
-      * with the registry based on its contents.
+      *  Read configurationModel, registering bean definitions with the registry based on its contents.
       */
+     //代码1
      public void loadBeanDefinitions(Set<ConfigurationClass> configurationModel) {
          TrackedConditionEvaluator trackedConditionEvaluator = new TrackedConditionEvaluator();
          for (ConfigurationClass configClass : configurationModel) {
@@ -134,8 +134,8 @@ import org.apache.commons.logging.Log;
      }
  
      /**
-      * Read a particular {@link ConfigurationClass}, registering bean definitions
-      * for the class itself and all of its {@link Bean} methods.
+          Read a particular ConfigurationClass, 
+          registering bean definitions for the class itself and all of its Bean methods.
       */
      private void loadBeanDefinitionsForConfigurationClass(
              ConfigurationClass configClass, TrackedConditionEvaluator trackedConditionEvaluator) {
@@ -153,7 +153,7 @@ import org.apache.commons.logging.Log;
              registerBeanDefinitionForImportedConfigurationClass(configClass);
          }
          for (BeanMethod beanMethod : configClass.getBeanMethods()) {
-             loadBeanDefinitionsForBeanMethod(beanMethod);
+             loadBeanDefinitionsForBeanMethod(beanMethod);                // 见代码10
          }
  
          loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
@@ -190,6 +190,7 @@ import org.apache.commons.logging.Log;
      private void loadBeanDefinitionsForBeanMethod(BeanMethod beanMethod) {
          ConfigurationClass configClass = beanMethod.getConfigurationClass();
          MethodMetadata metadata = beanMethod.getMetadata();
+         // 方法名
          String methodName = metadata.getMethodName();
  
          // Do we need to mark the bean as skipped by its condition?
@@ -303,6 +304,12 @@ import org.apache.commons.logging.Log;
          this.registry.registerBeanDefinition(beanName, beanDefToRegister);
      }
  
+
+
+
+
+
+     
      protected boolean isOverriddenByExistingDefinition(BeanMethod beanMethod, String beanName) {
          if (!this.registry.containsBeanDefinition(beanName)) {
              return false;

@@ -62,7 +62,7 @@ final class PostProcessorRegistrationDelegate {
 	 *         1. 执行所有实现了 PriorityOrdered 的 BeanDefinitionRegistryPostProcessor 的 postProcessBeanDefinitionRegistry 方法
 	 *         2. 执行所有实现了 Ordered         的 BeanDefinitionRegistryPostProcessor 的 postProcessBeanDefinitionRegistry 方法
 	 *         3. 执行了啥都没实现               的 BeanDefinitionRegistryPostProcessor 的 postProcessBeanDefinitionRegistry 方法
-	 *         4. 执行了以上这些                    BeanDefinitionRegistryPostProcessor的 postProcessBeanFactory 方法
+	 *         4. 执行了以上这些                    BeanDefinitionRegistryPostProcessor 的 postProcessBeanFactory 方法
 	 * 
 	 *  step2: 执行所有的 BeanFactoryPostProcessor
 	 *         1. 执行所有实现了 PriorityOrdered 的 BeanFactoryPostProcessor 的 postProcessBeanFactory 方法
